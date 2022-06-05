@@ -42,22 +42,11 @@ def preprocess(image):
 parse_objects = ParseObjects(topology)
 draw_objects = DrawObjects(topology)
 
-#cap = cv2.VideoCapture(0)
-##cap.set(cv2.CAP_PROP_FPS, 60)
-#print("FPS:", cap.get(cv2.CAP_PROP_FPS))
-#
-#width, height = (
-#        cap.get(cv2.CAP_PROP_FRAME_WIDTH),
-#        cap.get(cv2.CAP_PROP_FRAME_HEIGHT),
-#    )
-#print(f"Camera dimensions: {width, height}")
-#print(f"Camera FPS: {cap.get(cv2.CAP_PROP_FPS)}")
-
-cap = cv2.VideoCapture(1, cv2.CAP_V4L2) # cv2.CAP_DSHOW
+cap = cv2.VideoCapture(1, cv2.CAP_V4L2)
 cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-cap.set(cv2.CAP_PROP_FPS, 60) 
+cap.set(cv2.CAP_PROP_FPS, 60)
 
 width, height = ( 
         cap.get(cv2.CAP_PROP_FRAME_WIDTH),
@@ -66,27 +55,23 @@ width, height = (
 print(f"Camera dimensions: {width, height}")
 print(f"Camera FPS: {cap.get(cv2.CAP_PROP_FPS)}")
 
-
-
 import time
 count= 0
 start = time.monotonic()
 while 1:
     ret, image = cap.read()
-    if ret:
+    if ret and 0:
         image = cv2.resize(image,(224,224))
-    else:
-        raise RuntimeError('Could not read')
 
-    if 1:
-        #start = time.monotonic()
+    if 0:
+        start = time.monotonic()
         data = preprocess(image)
         cmap, paf = model_trt(data)
         cmap, paf = cmap.detach().cpu(), paf.detach().cpu()
         counts, objects, peaks = parse_objects(cmap, paf)#, cmap_threshold=0.15, link_threshold=0.15)
-        #draw_objects(image, counts, objects, peaks)
+        draw_objects(image, counts, objects, peaks)
 
-    if 0:
+    if False:
         cv2.imshow('frame', cv2.resize(image,(640,480)))
         if cv2.waitKey(1) == ord('q'):
             break
@@ -98,3 +83,4 @@ while 1:
 
 cap.release()
 cv2.destroyAllWindows()
+
